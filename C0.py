@@ -1,15 +1,15 @@
 from datasets import load_dataset
 import chromadb
-from sentence_transformers import SentenceTransformer
-
-model = SentenceTransformer('all-MiniLM-L6-v2') 
+from chromadb import Settings
+import numpy as np
 
 # Funcio per conectar a Chroma
 def connect_to_chroma():
     try:
-        client = chromadb.Client()
+        client = chromadb.Client(Settings())
         print('Connected to the Chroma database.')
         return client
+    
     except Exception as error:
         print(f"Error connecting to Chroma: {error}")
         return None
@@ -19,6 +19,7 @@ def create_collection(client, collection_name):
     try:
         client.get_or_create_collection(name = collection_name)
         print("Collection created successfully.")
+
     except Exception as e:
         print(f"Error creating collection: {e}")
 
@@ -29,16 +30,17 @@ def insert_sentences(sentences, client, collection_name):
         ids = [str(i) for i in range(len(sentences))]
 
         text = [{'text': sentence} for sentence in sentences]
-        embedding = [model.encode(sentence) for sentence in sentences]
+        zero_embeddings = np.zeros((len(sentences), 128)).tolist()
 
         # Afegeix data a la collection
-        collection.add(ids=ids, documents=text, embeddings=embedding)
+        collection.add(ids=ids, metadatas=text, embeddings= zero_embeddings)
         print("Sentences inserted successfully.")
+
     except Exception as e:
         print(f"Error inserting sentences: {e}")
 
-
 if __name__ == '__main__':
+    
     # Conecta a Chroma
     client = connect_to_chroma()
 
