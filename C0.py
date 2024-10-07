@@ -1,9 +1,10 @@
-from datasets import load_dataset
 import chromadb
+from chromadb import Client
 from chromadb import Settings
 import numpy as np
 import time
 import statistics
+from datasets import load_dataset
 
 minimum = float('inf')
 maximum = float('-inf')
@@ -13,75 +14,55 @@ times = []
 # Funcio per conectar a Chroma
 def connect_to_chroma():
     try:
-        client = chromadb.Client(Settings())
+        client = Client(Settings())
         print('Connected to the Chroma database.')
         return client
     
     except Exception as error:
         print(f"Error connecting to Chroma: {error}")
         return None
-    
-# Crea la collection si no existeix 
-def create_collection(client, collection_name):
-    try:
-        client.create_collection(name = collection_name)
-        print("Collection created successfully.")
 
-    except Exception as e:
-        print(f"Error creating collection: {e}")
 
 # Inserta les frases a la collection
-def insert_sentences(sentences, client, collection_name):
-    try:
-        collection = client.get_collection(collection_name)
-        ids = [str(i) for i in range(len(sentences))]
-
-        text = [{'text': sentence} for sentence in sentences]
-        zero_embeddings = np.zeros((len(sentences), 128)).tolist()
+def insert_sentences(client, collection_name, sentences):
+    collection = client.get_or_create_collection(collection_name)
+    ids = [str(i) for i in range(len(sentences))]
         
-        # Afegeix data a la collection
-        for i in range(len(sentences)):
-            try:
-                # Captura el temps d'inserció
-                temps = time.time()
-                collection.add(ids=[ids[i]], metadatas=[text[i]], embeddings=[zero_embeddings[i]])
-                temps = time.time() - temps
-                
-                # Actualitza els valors de temps mínim, màxim, total
-                global minimum, maximum, total
-                if temps < minimum:
-                    minimum = temps
-                if temps > maximum:
-                    maximum = temps
-                total += temps
-                times.append(temps)
-            
-            except Exception as e:
-                print(f"Error inserting sentence {i}: {e}")
+    # Afegeix data a la collection
+    for i in range(len(sentences)):
+        temps = time.time()
+        collection.upsert(ids=[ids[i]], documents=[sentences[i]])
+        temps = time.time() - temps
+        global minimum, maximum, total
+        if temps < minimum:
+            minimum = temps
+        if temps > maximum:
+            maximum = temps
+        total += temps
+        times.append(temps)
 
-        
-        print("Sentences inserted successfully.")
+        # Mostra el progrés a la consola
+        if i % 100 == 0:  # Per mostrar el progrés cada 100 insercions
+            print(f"{i} sentences inserted so far...")
 
-    except Exception as e:
-        print(f"Error inserting sentences: {e}")
+    print("Sentences inserted successfully.")
+
+
 
 if __name__ == '__main__':
 
     # Conecta a Chroma
     client = connect_to_chroma()
-
+    
     collection_name = 'bookcorpus'
-
-    # Crea la collection
-    create_collection(client, collection_name)
 
     ds = load_dataset("williamkgao/bookcorpus100mb", split ="train")
     subset = ds.select(range(10000))
     sentences = [item['text'] for item in subset]
- 
+
     # Inserta les frases a la collection
     if client:
-        insert_sentences(sentences, client, collection_name)
+        insert_sentences(client, collection_name, sentences)
         print("Temps mínim: ", minimum)
         print("Temps màxim: ", maximum)
         print("Temps mitjà: ", total/10000)

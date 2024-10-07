@@ -1,9 +1,9 @@
 from chromadb import Client
 from chromadb import Settings
 from sentence_transformers import SentenceTransformer
-from datasets import load_dataset
 import time
 import statistics
+from datasets import load_dataset
 
 minimum = float('inf')
 maximum = float('-inf')
@@ -45,7 +45,7 @@ def insert_sentences(sentences, client, collection_name):
         # Afegeix data a la collection
         for i in range(len(sentences)):
             temps = time.time()
-            collection.add(ids=[ids[i]], metadatas=[text[i]], embeddings=[embedding[i]])
+            collection.upsert(ids=[ids[i]], documents=[sentences[i]], embeddings=[embedding[i]])
             temps = time.time() - temps
             global minimum, maximum, total
             if temps < minimum:
@@ -54,6 +54,10 @@ def insert_sentences(sentences, client, collection_name):
                     maximum = temps
             total += temps
             times.append(temps)
+
+            # Mostra el progrés a la consola
+            if i % 100 == 0:  # Per mostrar el progrés cada 100 insercions
+                print(f"{i} sentences inserted so far...")
 
         print("Sentences inserted successfully.")
 
@@ -65,7 +69,7 @@ if __name__ == '__main__':
     # Conecta a Chroma
     client = connect_to_chroma()
 
-    collection_name = 'bookcorpus_emb'
+    collection_name = 'bookcorpus_emb2121212'
 
     # Crea la collection
     create_collection(client, collection_name)
