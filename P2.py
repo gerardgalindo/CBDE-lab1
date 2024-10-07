@@ -7,7 +7,8 @@ from config import load_config
 def fetch_sentences(limit, conn):
     cursor = conn.cursor()
     
-    cursor.execute("SELECT id, sentence, embedding FROM book_sentences ORDER BY id LIMIT %s;", (limit,))
+    cursor.execute("SELECT id, text, embedding FROM bookcorpus ORDER BY id LIMIT %s;", (limit,))
+
     sentences = cursor.fetchall()
 
     cursor.close()
@@ -18,7 +19,7 @@ def fetch_sentences(limit, conn):
 def fetch_all_sentences(conn):
     cursor = conn.cursor()
     
-    cursor.execute("SELECT id, sentence, embedding FROM book_sentences")
+    cursor.execute("SELECT id, text, embedding FROM bookcorpus")
     sentences = cursor.fetchall()
 
     cursor.close()
