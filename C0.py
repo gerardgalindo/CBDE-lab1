@@ -17,7 +17,7 @@ def connect_to_chroma():
 # Crea la collection si no existeix 
 def create_collection(client, collection_name):
     try:
-        client.get_or_create_collection(name = collection_name)
+        client.create_collection(name = collection_name)
         print("Collection created successfully.")
 
     except Exception as e:
@@ -40,7 +40,7 @@ def insert_sentences(sentences, client, collection_name):
         print(f"Error inserting sentences: {e}")
 
 if __name__ == '__main__':
-    
+
     # Conecta a Chroma
     client = connect_to_chroma()
 
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     create_collection(client, collection_name)
 
     ds = load_dataset("williamkgao/bookcorpus100mb", split ="train")
-    subset = ds.select(range(10))
+    subset = ds.select(range(10000))
     sentences = [item['text'] for item in subset]
  
     # Inserta les frases a la collection
