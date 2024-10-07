@@ -1,6 +1,14 @@
 import psycopg2
 from config import load_config
 from sentence_transformers import SentenceTransformer
+import time
+import statistics
+
+minimum = float('inf')
+maximum = float('-inf')
+total = 0
+times = []
+model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
 def alter_table():
     try:
@@ -15,7 +23,6 @@ def alter_table():
         print(error)
 
 def process_sentence(sentence):
-    model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
     embedding = model.encode(sentence)
     return embedding.tolist()
 
@@ -30,7 +37,18 @@ def update_embedding(row_id, embedding):
         with  psycopg2.connect(**config) as conn:
             with  conn.cursor() as cur:
                 # execute the UPDATE statement
+                print("inserint embedding per a la fila: ", row_id)
+                temps = time.time()
                 cur.execute(sql, (embedding, row_id))
+                temps = time.time() - temps
+                global minimum, maximum, total
+                if temps < minimum:
+                    minimum = temps
+                if temps > maximum:
+                    maximum = temps
+                total += temps
+                times.append(temps)
+                #print("Temps d'execució: ", time.time() - temps)
 
             # commit the changes to the database
             conn.commit()
@@ -53,6 +71,15 @@ if __name__ == '__main__':
                     sentence = row[1]
                     embedding = process_sentence(sentence)
                     update_embedding(row_id, embedding)
+
+        print("Temps mínim: ", minimum)
+        print("Temps màxim: ", maximum)
+        print("Total rows: ", len(rows))
+        print("Temps mitjà: ", total/len(rows))
+        print("Desviació estàndard: ", statistics.stdev(times))
+
+
+
 
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)

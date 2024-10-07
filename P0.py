@@ -1,12 +1,19 @@
 from datasets import load_dataset
 from config import load_config
 import psycopg2
+import time
+import statistics
+
+minimum = float('inf')
+maximum = float('-inf')
+total = 0
+times = []
 
 def create_table():
     try:
         config = load_config()
         query = """
-        CREATE TABLE IF NOT EXISTS bookcorpus (
+        CREATE TABLE IF NOT EXISTS bookcorpus2 (
             id SERIAL PRIMARY KEY,
             text TEXT NOT NULL
         )
@@ -23,7 +30,16 @@ def insert_sentences(sentences):
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
                 for sentence in sentences:
-                    cur.execute("INSERT INTO bookcorpus (text) VALUES (%s)", (sentence,))
+                    temps = time.time()
+                    cur.execute("INSERT INTO bookcorpus2 (text) VALUES (%s)", (sentence,))
+                    temps = time.time() - temps
+                    global minimum, maximum, total
+                    if temps < minimum:
+                        minimum = temps
+                    if temps > maximum:
+                        maximum = temps
+                    total += temps
+                    times.append(temps)
                 conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
@@ -36,3 +52,8 @@ if __name__ == '__main__':
     sentences = [item['text'] for item in subset]
     
     insert_sentences(sentences)
+
+    print("Temps mínim: ", minimum)
+    print("Temps màxim: ", maximum)
+    print("Temps mitjà: ", total/10000)
+    print("Desviació estàndard: ", statistics.stdev(times))
