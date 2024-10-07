@@ -85,11 +85,11 @@ if __name__ == '__main__':
                 # frases semblants amb euclidean distance
                 print("Top 2 frases semblants (Euclidean Distance):")
                 for sim_id, sim_sentence, score in similarities["euclidean_distance"]:
-                    print(f" - ID: {sim_id}, Frase: \"{sim_sentence}\", Score: {score:.4f}")
+                    print(f" - ID: {sim_id}, Frase: \"{sim_sentence}\", Distancia: {score:.4f}")
                 # frases semblants amb cosine similarity
                 print("Top 2 frases semblants (Cosine Similarity):")
                 for sim_id, sim_sentence, score in similarities["cosine_similarity"]:
-                    print(f" - ID: {sim_id}, Frase: \"{sim_sentence}\", Score: {score:.4f}")
+                    print(f" - ID: {sim_id}, Frase: \"{sim_sentence}\", Distancia: {score:.4f}")
                 print("\n")
 
     except (Exception, psycopg2.DatabaseError) as error:
