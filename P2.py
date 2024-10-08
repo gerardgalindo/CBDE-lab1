@@ -2,6 +2,11 @@ import psycopg2
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
 from config import load_config
+import time
+import statistics
+
+times = []
+
 
 # Agafa 10 frases
 def fetch_sentences(limit, conn):
@@ -28,6 +33,7 @@ def fetch_all_sentences(conn):
 
 # Busca les dues frases mes semblants
 def find_similar_senteces(sentences, all_sentences):
+    global times
 
     # Separar les dades 
     ids, text_sentences, embeddings = zip(*sentences)
@@ -38,10 +44,34 @@ def find_similar_senteces(sentences, all_sentences):
     all_embeddings_array = np.array([np.array(embed) for embed in all_embeddings])
 
     # Euclidean distancia, funcio de la llibreria sklearn.metrics.pairwise
-    euclidean_dist_matrix = euclidean_distances(embeddings_array, all_embeddings_array)
+    euclidean_dist_matrix = []
+    for i in range(len(embeddings_array)):
+        temps = time.time()
+        euclidean_dist_matrix.append(euclidean_distances(embeddings_array[i].reshape(1,-1), all_embeddings_array)[0])
+        times.append(time.time() - temps)
 
-    # Manhatann distancia 
-    cos_sim_matrix = cosine_similarity(embeddings_array, all_embeddings_array)
+    print("---- Temps euclidean_distances ----")
+    print("Temps mínim: ", min(times))
+    print("Temps màxim: ", max(times))
+    print("Temps mitjà: ", sum(times)/len(times))
+    print("Desviació estàndard: ", statistics.stdev(times))
+    print("---------------------------------")
+
+    times = []
+
+    # Cosine Similarity
+    cos_sim_matrix = []
+    for i in range(len(embeddings_array)):
+        temps = time.time()
+        cos_sim_matrix.append(cosine_similarity(embeddings_array[i].reshape(1,-1), all_embeddings_array)[0])
+        times.append(time.time() - temps)
+
+    print("---- Temps cosine similarity ----")
+    print("Temps mínim: ", min(times))
+    print("Temps màxim: ", max(times))
+    print("Temps mitjà: ", sum(times)/len(times))
+    print("Desviació estàndard: ", statistics.stdev(times))
+    print("---------------------------------")
 
     similar_sentences = {}
 
