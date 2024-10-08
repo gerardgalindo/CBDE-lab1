@@ -14,7 +14,7 @@ def alter_table():
     try:
         config = load_config()
         query = """
-        ALTER TABLE bookcorpus ADD COLUMN embedding FLOAT8[]; 
+        ALTER TABLE bookcorpus_pgvector ADD COLUMN embedding vector(384); 
         """
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
@@ -27,7 +27,7 @@ def process_sentence(sentence):
     return embedding.tolist()
 
 def update_embedding(row_id, embedding):
-    sql = """ UPDATE bookcorpus
+    sql = """ UPDATE bookcorpus_pgvector
                 SET embedding = %s
                 WHERE id = %s"""
     
@@ -63,7 +63,7 @@ if __name__ == '__main__':
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT id, text FROM bookcorpus")
+                cur.execute("SELECT id, text FROM bookcorpus_pgvector")
                 rows = cur.fetchall()
                     
                 for row in rows:

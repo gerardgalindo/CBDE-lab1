@@ -13,8 +13,8 @@ def create_table():
     try:
         config = load_config()
         query = """
-        CREATE TABLE IF NOT EXISTS bookcorpus (
-            id SERIAL PRIMARY KEY,
+        CREATE TABLE IF NOT EXISTS bookcorpus_pgvector (
+            id bigserial PRIMARY KEY,
             text TEXT NOT NULL
         )
         """
@@ -31,7 +31,7 @@ def insert_sentences(sentences):
             with conn.cursor() as cur:
                 for sentence in sentences:
                     temps = time.time()
-                    cur.execute("INSERT INTO bookcorpus (text) VALUES (%s)", (sentence,))
+                    cur.execute("INSERT INTO bookcorpus_pgvector (text) VALUES (%s)", (sentence,))
                     temps = time.time() - temps
                     global minimum, maximum, total  
                     if temps < minimum:
