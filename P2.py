@@ -43,7 +43,7 @@ def find_similar_senteces(sentences, all_sentences):
     embeddings_array = np.array([np.array(embed) for embed in embeddings])
     all_embeddings_array = np.array([np.array(embed) for embed in all_embeddings])
 
-    # Euclidean distancia, funcio de la llibreria sklearn.metrics.pairwise
+    # Euclidean distance, funcio de la llibreria sklearn.metrics.pairwise
     euclidean_dist_matrix = []
     for i in range(len(embeddings_array)):
         temps = time.time()
