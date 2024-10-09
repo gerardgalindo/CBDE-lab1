@@ -45,8 +45,8 @@ def find_similar_pgvector(metric, sentence, conn):
 def find_similar_sentences(sentences, conn):
     global times
 
+    print("Calculating similarities with euclidean distance")
     # Euclidean distance
-    euclidean_dist_matrix = []
     for i in range(len(sentences)):
         find_similar_pgvector("<->", sentences[i], conn)
 
