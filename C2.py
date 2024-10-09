@@ -165,13 +165,12 @@ if __name__ == '__main__':
         print("---------------------------------")
         print("Temps mínim: ", minimum)
         print("Temps màxim: ", maximum)
-        print("Temps mitjà: ", total/10000)
+        print("Temps mitjà: ", total/10)
         print("Desviació estàndard: ", statistics.stdev(times))
         print("---------------------------------")
 
 
         initialize()
-        print("Total per veure que s'ha reiniciat", total)
         similar_sentences_cos = find_similar_sentences(sentences_cos, collection_name_cosinus)
 
         for sentence, similarities in similar_sentences_cos.items():
@@ -193,7 +192,7 @@ if __name__ == '__main__':
         print("---------------------------------")
         print("Temps mínim: ", minimum)
         print("Temps màxim: ", maximum)
-        print("Temps mitjà: ", total/10000)
+        print("Temps mitjà: ", total/10)
         print("Desviació estàndard: ", statistics.stdev(times))
         print("---------------------------------")
 
