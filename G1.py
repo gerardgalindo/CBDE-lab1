@@ -10,6 +10,7 @@ total = 0
 times = []
 model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
+# afegir columna embeddings a la taula
 def alter_table():
     try:
         config = load_config()
@@ -22,10 +23,12 @@ def alter_table():
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 
+# funcio per calcular els embeddings
 def process_sentence(sentence):
     embedding = model.encode(sentence)
     return embedding.tolist()
 
+# actualitzar la taula amb els embeddings
 def update_embedding(row_id, embedding):
     sql = """ UPDATE bookcorpus_pgvector
                 SET embedding = %s
@@ -50,7 +53,6 @@ def update_embedding(row_id, embedding):
                 times.append(temps)
                 #print("Temps d'execució: ", time.time() - temps)
 
-            # commit the changes to the database
             conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)    
@@ -77,9 +79,6 @@ if __name__ == '__main__':
         print("Total rows: ", len(rows))
         print("Temps mitjà: ", total/len(rows))
         print("Desviació estàndard: ", statistics.stdev(times))
-
-
-
 
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)

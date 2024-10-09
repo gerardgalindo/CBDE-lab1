@@ -7,7 +7,6 @@ import statistics
 
 times = []
 
-
 # Agafa 10 frases
 def fetch_sentences(limit, conn):
     cursor = conn.cursor()
@@ -19,6 +18,7 @@ def fetch_sentences(limit, conn):
     
     return sentences
 
+# Busca les dues frases mes semblants
 def find_similar_pgvector(metric, sentence, conn):
     id, text, embedding = sentence
     
@@ -28,7 +28,6 @@ def find_similar_pgvector(metric, sentence, conn):
         ORDER BY embedding {metric} '{embedding}'
         LIMIT 3;
         """
-
     
     with conn.cursor() as cursor:
         temps = time.time()
@@ -38,7 +37,7 @@ def find_similar_pgvector(metric, sentence, conn):
     
     print(f"Comparing sentence ID {id}: '{text}'")
     print("Two most similar sentences:")
-    for result in results[1:3]:  # Skip the first result as it is the sentence itself
+    for result in results[1:3]:  # per no agafar la mateixa frase
         similar_id, similar_text, distance = result
         print(f"ID: {similar_id}, Sentence: '{similar_text}', Distance: {distance}")
 
@@ -79,10 +78,10 @@ if __name__ == '__main__':
         with psycopg2.connect(**config) as conn:
             num_frases = 10
 
-            #Agafa 10 frases
+            # Agafa 10 frases
             sentences = fetch_sentences(num_frases, conn)
             
-            #Cerca les 2 frases més semblants
+            # Cerca les 2 frases més semblants
             similar_sentences = find_similar_sentences(sentences, conn)
 
     except (Exception, psycopg2.DatabaseError) as error:

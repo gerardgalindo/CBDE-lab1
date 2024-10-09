@@ -77,7 +77,6 @@ def insert_sentences(sentences, client, collection_name_euclidean, collection_na
 
 # Agafa 10 frases
 def fetch_sentences(client, collection_name):
-    # Assuming you have a collection named 'book_sentences' in ChromaDB
     collection = client.get_collection(collection_name)
 
     result = collection.get(
@@ -157,7 +156,7 @@ if __name__ == '__main__':
             metadatas = similarities['metadatas'][0][1:3] 
 
             for sim_id, distance, metadata in zip(ids, distances, metadatas):
-                sim_sentence = metadata['text']  # Extract the sentence from the metadata
+                sim_sentence = metadata['text'] # Extreure sentence de metadata
                 print(f" - ID: {sim_id}, Frase: \"{sim_sentence}\", Distancia: {distance:.4f}")
             
             print()
@@ -184,7 +183,7 @@ if __name__ == '__main__':
             metadatas = similarities['metadatas'][0][1:3] 
 
             for sim_id, distance, metadata in zip(ids, distances, metadatas):
-                sim_sentence = metadata['text']  # Extract the sentence from the metadata
+                sim_sentence = metadata['text']  # Extreure sentence de metadata
                 print(f" - ID: {sim_id}, Frase: \"{sim_sentence}\", Distancia: {distance:.4f}")
             
             print()

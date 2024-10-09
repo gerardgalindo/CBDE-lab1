@@ -9,6 +9,7 @@ maximum = float('-inf')
 total = 0
 times = []
 
+# crear la taula
 def create_table():
     try:
         config = load_config()
@@ -24,6 +25,7 @@ def create_table():
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 
+#inserir frases a la taula
 def insert_sentences(sentences):
     try:
         config = load_config()
